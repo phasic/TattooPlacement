@@ -131,17 +131,17 @@ export default function App() {
                 : `${placements.length} ${placements.length === 1 ? 'person has' : 'people have'} voted so far — here's the verdict!`}
             </p>
 
-            <div className="body-container heatmap-container" ref={svgContainerRef}>
-              <BodyOutline className="body-svg">
-                {/* empty — no click handler in heatmap view */}
-              </BodyOutline>
-              {!loading && svgDimensions.width > 0 && (
-                <HeatmapOverlay
-                  placements={placements}
-                  svgWidth={svgDimensions.width}
-                  svgHeight={svgDimensions.height}
-                />
-              )}
+            <div className="body-container">
+              <div className="svg-heatmap-wrapper" ref={svgContainerRef}>
+                <BodyOutline className="body-svg" />
+                {!loading && svgDimensions.width > 0 && (
+                  <HeatmapOverlay
+                    placements={placements}
+                    svgWidth={svgDimensions.width}
+                    svgHeight={svgDimensions.height}
+                  />
+                )}
+              </div>
             </div>
 
             <div className="legend">
