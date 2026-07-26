@@ -221,9 +221,9 @@ button:disabled {
   color: var(--muted);
 }
 
-/* ── Heatmap container — needs relative positioning ── */
+/* ── Heatmap container — keeps flex centering from .body-container ── */
 .heatmap-container {
-  display: block;
+  display: flex;
 }
 
 /* ── Legend ── */
