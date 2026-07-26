@@ -3,32 +3,45 @@ import { BodyOutline } from './components/BodyOutline'
 import { ClickMarker } from './components/ClickMarker'
 import { HeatmapOverlay } from './components/HeatmapOverlay'
 import { ConfirmButton } from './components/ConfirmButton'
-import { usePlacements } from './hooks/usePlacements'
+import { TattooDesignModal } from './components/TattooDesignModal'
+import { usePlacements, type BodySide } from './hooks/usePlacements'
 import './App.css'
 
 type View = 'select' | 'success' | 'heatmap'
 
-export default function App() {
-  const [view, setView] = useState<View>('select')
-  const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null)
-  const svgContainerRef = useRef<HTMLDivElement>(null)
-  const [svgDimensions, setSvgDimensions] = useState({ width: 0, height: 0 })
-
-  const { placements, loading, submitting, error, canSubmit, cooldownRemaining, submitPlacement, refetch } =
-    usePlacements()
-
+function useSvgSize(ref: React.RefObject<HTMLDivElement | null>, dep: unknown) {
+  const [dims, setDims] = useState({ width: 0, height: 0 })
   useEffect(() => {
     const measure = () => {
-      if (!svgContainerRef.current) return
-      const svg = svgContainerRef.current.querySelector('svg')
+      if (!ref.current) return
+      const svg = ref.current.querySelector('svg')
       if (!svg) return
-      const rect = svg.getBoundingClientRect()
-      setSvgDimensions({ width: rect.width, height: rect.height })
+      const r = svg.getBoundingClientRect()
+      setDims({ width: r.width, height: r.height })
     }
     measure()
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
-  }, [view])
+  }, [ref, dep])
+  return dims
+}
+
+export default function App() {
+  const [view, setView] = useState<View>('select')
+  const [activeSide, setActiveSide] = useState<BodySide>('front')
+  const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null)
+  const [showDesign, setShowDesign] = useState(false)
+
+  const svgRef = useRef<HTMLDivElement>(null)
+  const frontHeatRef = useRef<HTMLDivElement>(null)
+  const backHeatRef = useRef<HTMLDivElement>(null)
+
+  const { frontPlacements, backPlacements, placements, loading, submitting, error,
+    canSubmit, cooldownRemaining, submitPlacement, refetch } = usePlacements()
+
+  useSvgSize(svgRef, view) // kept to trigger re-measure on view change
+  const frontDims = useSvgSize(frontHeatRef, view)
+  const backDims = useSvgSize(backHeatRef, view)
 
   const handleBodyClick = useCallback((x: number, y: number) => {
     if (view !== 'select') return
@@ -37,9 +50,9 @@ export default function App() {
 
   const handleConfirm = useCallback(async () => {
     if (!pendingPoint) return
-    const ok = await submitPlacement(pendingPoint)
+    const ok = await submitPlacement({ x: pendingPoint.x, y: pendingPoint.y, side: activeSide })
     if (ok) setView('success')
-  }, [pendingPoint, submitPlacement])
+  }, [pendingPoint, activeSide, submitPlacement])
 
   const handleViewHeatmap = useCallback(async () => {
     if (canSubmit()) return
@@ -59,26 +72,54 @@ export default function App() {
 
   const alreadySubmitted = !canSubmit()
 
+  const SideToggle = () => (
+    <div className="side-toggle">
+      <button
+        className={`toggle-btn ${activeSide === 'front' ? 'active' : ''}`}
+        onClick={() => { setActiveSide('front'); setPendingPoint(null) }}
+      >
+        Front
+      </button>
+      <button
+        className={`toggle-btn ${activeSide === 'back' ? 'active' : ''}`}
+        onClick={() => { setActiveSide('back'); setPendingPoint(null) }}
+      >
+        Back
+      </button>
+    </div>
+  )
+
   return (
     <div className="app">
+      {showDesign && <TattooDesignModal onClose={() => setShowDesign(false)} />}
 
       {/* ── Selection view ── */}
       {view === 'select' && (
         <>
           <header className="app-header">
-            <h1>Help Tieke decide where to place her first tattoo 🖊️</h1>
-            <p className="instruction">
-              {alreadySubmitted
-                ? `You've already voted! Come back in ${formatCooldown(cooldownRemaining())} to vote again.`
-                : pendingPoint
-                ? 'Ooh, nice choice! Lock it in below 👇'
-                : 'Tap the body where you think the tattoo should go'}
-            </p>
+            <div className="header-card">
+              <button className="design-peek-btn" onClick={() => setShowDesign(true)}>
+                🌸 See the tattoo design
+              </button>
+              <h1>Help Tieke decide where to place her first tattoo 🖊️</h1>
+              <p className="instruction">
+                {alreadySubmitted
+                  ? `You've already voted! Come back in ${formatCooldown(cooldownRemaining())} to vote again.`
+                  : pendingPoint
+                  ? 'Ooh, nice choice! Lock it in below 👇'
+                  : 'Tap the body where you think the tattoo should go'}
+              </p>
+            </div>
           </header>
 
           <main className="app-main">
-            <div className="body-container" ref={svgContainerRef}>
-              <BodyOutline onClick={alreadySubmitted ? undefined : handleBodyClick} className="body-svg">
+            <SideToggle />
+            <div className="body-container" ref={svgRef}>
+              <BodyOutline
+                side={activeSide}
+                onClick={alreadySubmitted ? undefined : handleBodyClick}
+                className="body-svg"
+              >
                 {pendingPoint && <ClickMarker x={pendingPoint.x} y={pendingPoint.y} />}
               </BodyOutline>
             </div>
@@ -126,26 +167,58 @@ export default function App() {
       {view === 'heatmap' && (
         <>
           <header className="app-header">
-            <h1>Here's the verdict 🗳️</h1>
-            <p className="instruction">
-              {loading
-                ? 'Loading votes…'
-                : `${placements.length} ${placements.length === 1 ? 'person has' : 'people have'} voted so far`}
-            </p>
+            <div className="header-card">
+              <button className="design-peek-btn" onClick={() => setShowDesign(true)}>
+                🌸 See the tattoo design
+              </button>
+              <h1>Here's the verdict 🗳️</h1>
+              <p className="instruction">
+                {loading
+                  ? 'Loading votes…'
+                  : `${placements.length} ${placements.length === 1 ? 'person has' : 'people have'} voted so far`}
+              </p>
+            </div>
           </header>
 
-          <main className="app-main">
-            <div className="body-container">
-              <div className="svg-heatmap-wrapper" ref={svgContainerRef}>
-                <BodyOutline className="body-svg" />
-                {!loading && svgDimensions.width > 0 && (
-                  <HeatmapOverlay
-                    placements={placements}
-                    svgWidth={svgDimensions.width}
-                    svgHeight={svgDimensions.height}
-                  />
-                )}
+          <main className="app-main heatmap-main">
+            <div className="dual-heatmap">
+
+              <div className="heat-panel">
+                <span className="heat-panel-label">Front</span>
+                <div className="body-container">
+                  <div className="svg-heatmap-wrapper" ref={frontHeatRef}>
+                    <BodyOutline side="front" className="body-svg" />
+                    {!loading && frontDims.width > 0 && (
+                      <HeatmapOverlay
+                        placements={frontPlacements}
+                        svgWidth={frontDims.width}
+                        svgHeight={frontDims.height}
+                      />
+                    )}
+                  </div>
+                </div>
+                <span className="heat-panel-count">{frontPlacements.length} votes</span>
               </div>
+
+              <div className="heat-divider" />
+
+              <div className="heat-panel">
+                <span className="heat-panel-label">Back</span>
+                <div className="body-container">
+                  <div className="svg-heatmap-wrapper" ref={backHeatRef}>
+                    <BodyOutline side="back" className="body-svg" />
+                    {!loading && backDims.width > 0 && (
+                      <HeatmapOverlay
+                        placements={backPlacements}
+                        svgWidth={backDims.width}
+                        svgHeight={backDims.height}
+                      />
+                    )}
+                  </div>
+                </div>
+                <span className="heat-panel-count">{backPlacements.length} votes</span>
+              </div>
+
             </div>
           </main>
 

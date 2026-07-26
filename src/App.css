@@ -6,11 +6,11 @@
 }
 
 :root {
-  --bg: #fdf6f0;
+  --bg: #ddd5f0;
   --surface: #ffffff;
-  --border: #e8ddd5;
+  --border: #c8bfe0;
   --text: #1a1a2e;
-  --muted: #7a6f6a;
+  --muted: #6a6080;
   --accent: #e84393;
   --accent2: #f97316;
   --accent3: #7c3aed;
@@ -22,7 +22,7 @@
 
 html, body {
   height: 100%;
-  overscroll-behavior: none;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -32,7 +32,7 @@ body {
   line-height: 1.5;
 }
 
-/* ── App shell: full-height column ── */
+/* ── App shell ── */
 .app {
   min-height: 100dvh;
   display: flex;
@@ -41,25 +41,54 @@ body {
 
 /* ── Header ── */
 .app-header {
-  padding: 1.25rem 1.25rem 0.75rem;
-  text-align: center;
   flex-shrink: 0;
+  padding: 1rem 1rem 0.5rem;
+  display: flex;
+  justify-content: center;
 }
 
-.app-header h1 {
-  font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+.app-header > div,
+.app-header {
+  width: 100%;
+}
+
+.header-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,255,255,0.9);
+  border-radius: 20px;
+  padding: 1rem 1.25rem 0.875rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.1), 0 1px 4px rgba(0,0,0,0.06);
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.header-card h1 {
+  font-size: clamp(1rem, 4vw, 1.35rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--text);
   line-height: 1.25;
+  background: linear-gradient(135deg, var(--accent3), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* ── Instruction line ── */
-.instruction {
-  margin-top: 0.4rem;
-  font-size: 0.9rem;
+.header-card .instruction {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
   color: var(--muted);
-  min-height: calc(0.9rem * 1.5 * 2);
+  min-height: calc(0.875rem * 1.5 * 2);
+}
+
+/* ── Instruction line (standalone, outside card) ── */
+.instruction {
+  font-size: 0.875rem;
+  color: var(--muted);
+  min-height: calc(0.875rem * 1.5 * 2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,8 +116,7 @@ body {
 }
 
 .body-svg {
-  height: 100%;
-  max-height: calc(100dvh - var(--footer-h) - 120px);
+  height: clamp(340px, calc(100dvh - var(--footer-h) - 130px), 600px);
   width: auto;
   display: block;
   filter: drop-shadow(0 8px 24px rgba(232,67,147,0.12));
@@ -238,6 +266,215 @@ button:disabled {
 }
 
 .success-view p {
+  color: var(--muted);
+  max-width: 300px;
+}
+
+/* ── Front / Back side toggle ── */
+.side-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.6);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.toggle-btn {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.4rem 1.25rem;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  width: auto;
+  max-width: none;
+  box-shadow: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: var(--accent3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.toggle-btn:active {
+  transform: none;
+}
+
+/* ── Dual heatmap layout ── */
+.heatmap-main {
+  padding-bottom: var(--footer-h);
+  overflow-y: auto;
+}
+
+.dual-heatmap {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  gap: 0;
+}
+
+.heat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.heat-panel .body-container {
+  flex: 1;
+  padding: 0.25rem;
+}
+
+.heat-panel .body-svg {
+  height: clamp(280px, calc(100dvh - var(--footer-h) - 160px), 560px);
+}
+
+.heat-panel-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.heat-panel-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.heat-divider {
+  width: 1.5px;
+  background: var(--border);
+  align-self: stretch;
+  margin: 0.5rem 0;
+  flex-shrink: 0;
+}
+
+/* ── Design peek button (inside header card) ── */
+.design-peek-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, #fce4d6, #f9d0e8);
+  color: var(--accent3);
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1.5px solid rgba(232,67,147,0.25);
+  border-radius: 999px;
+  padding: 0.35rem 0.875rem;
+  width: auto;
+  max-width: none;
+  margin-bottom: 0.6rem;
+  box-shadow: 0 2px 8px rgba(232,67,147,0.15);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.design-peek-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(232,67,147,0.25);
+}
+
+/* ── Dialog / modal ── */
+.design-dialog {
+  border: none;
+  border-radius: 24px;
+  padding: 0;
+  width: min(92vw, 440px);
+  max-height: 90dvh;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+  background: var(--surface);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+
+.design-dialog::backdrop {
+  background: rgba(26,26,46,0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.design-dialog-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1.25rem 1.75rem;
+  gap: 0.6rem;
+  text-align: center;
+  overflow-y: auto;
+  max-height: 90dvh;
+}
+
+.design-close {
+  align-self: flex-end;
+  background: #f3f0f8;
+  color: var(--muted);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  font-size: 0.85rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s ease;
+  flex-shrink: 0;
+  width: auto;
+  max-width: none;
+}
+
+.design-close:hover {
+  background: #e8e0f5;
+}
+
+.design-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.design-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.design-img-wrap {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: #fdf6f0;
+  margin: 0.25rem 0;
+}
+
+.design-img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.design-caption {
+  font-size: 0.85rem;
   color: var(--muted);
   max-width: 300px;
 }

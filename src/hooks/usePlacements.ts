@@ -9,14 +9,17 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase'
 
+export type BodySide = 'front' | 'back'
+
 export interface Placement {
   x: number
   y: number
+  side: BodySide
 }
 
 const COLLECTION = 'placements'
 const LS_KEY = 'tattoo_submitted_at'
-const COOLDOWN_MS = 60 * 60 * 1000 // 1 hour cooldown per browser
+const COOLDOWN_MS = 60 * 60 * 1000
 
 export function usePlacements() {
   const [placements, setPlacements] = useState<Placement[]>([])
@@ -33,8 +36,7 @@ export function usePlacements() {
   const cooldownRemaining = useCallback((): number => {
     const last = localStorage.getItem(LS_KEY)
     if (!last) return 0
-    const elapsed = Date.now() - parseInt(last, 10)
-    return Math.max(0, COOLDOWN_MS - elapsed)
+    return Math.max(0, COOLDOWN_MS - (Date.now() - parseInt(last, 10)))
   }, [])
 
   const fetchPlacements = useCallback(async () => {
@@ -44,7 +46,12 @@ export function usePlacements() {
       const snap = await getDocs(q)
       const data = snap.docs.map((d) => {
         const raw = d.data()
-        return { x: raw.x as number, y: raw.y as number }
+        return {
+          x: raw.x as number,
+          y: raw.y as number,
+          // legacy docs without 'side' default to 'front'
+          side: (raw.side as BodySide | undefined) ?? 'front',
+        }
       })
       setPlacements(data)
     } catch (e) {
@@ -69,7 +76,9 @@ export function usePlacements() {
         setSubmitting(true)
         setError(null)
         await addDoc(collection(db, COLLECTION), {
-          ...placement,
+          x: placement.x,
+          y: placement.y,
+          side: placement.side,
           createdAt: serverTimestamp(),
         })
         localStorage.setItem(LS_KEY, String(Date.now()))
@@ -86,8 +95,13 @@ export function usePlacements() {
     [canSubmit]
   )
 
+  const frontPlacements = placements.filter((p) => p.side === 'front')
+  const backPlacements = placements.filter((p) => p.side === 'back')
+
   return {
     placements,
+    frontPlacements,
+    backPlacements,
     loading,
     submitting,
     error,
