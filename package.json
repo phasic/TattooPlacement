@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "git add -A && git commit -m 'chore: deploy update' --allow-empty && git push && npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "firebase": "^12.16.0",
