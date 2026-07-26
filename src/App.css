@@ -1,0 +1,259 @@
+/* ── Reset & base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a24;
+  --surface2: #242433;
+  --border: #2e2e42;
+  --accent: #dc2626;
+  --accent2: #f97316;
+  --text: #e8e8f0;
+  --muted: #8888aa;
+  --body-fill: #2a2a3e;
+  --body-stroke: #7b6ef0;
+  --radius: 12px;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-header {
+  width: 100%;
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+  background: linear-gradient(180deg, #16162a 0%, transparent 100%);
+}
+
+.app-header h1 {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #7b6ef0, #dc2626);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  padding: 1.5rem 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* ── Instructions ── */
+.instruction {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+  max-width: 440px;
+}
+
+/* ── Body SVG container ── */
+.body-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.body-svg {
+  width: auto;
+  max-height: 70vh;
+  height: clamp(320px, 65vh, 560px);
+  display: block;
+  filter: drop-shadow(0 0 24px rgba(123, 110, 240, 0.25));
+}
+
+/* SVG shapes default fill/stroke */
+.body-svg ellipse,
+.body-svg path {
+  fill: var(--body-fill);
+  stroke: var(--body-stroke);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.body-svg line {
+  stroke: var(--body-stroke);
+  fill: none;
+}
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0.7rem 1.5rem;
+  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.confirm-btn,
+.primary-btn {
+  background: linear-gradient(135deg, #7b6ef0, #dc2626);
+  color: white;
+  box-shadow: 0 4px 20px rgba(123, 110, 240, 0.35);
+}
+
+.confirm-btn:hover:not(:disabled),
+.primary-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 28px rgba(123, 110, 240, 0.55);
+  transform: translateY(-1px);
+}
+
+.secondary-btn {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.secondary-btn:hover:not(:disabled) {
+  background: var(--border);
+}
+
+/* ── Spinner ── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error ── */
+.error-msg {
+  color: #f87171;
+  font-size: 0.875rem;
+  text-align: center;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+}
+
+/* ── Fine print ── */
+.fine-print {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── Success view ── */
+.success-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.success-icon {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.success-view h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.success-view p {
+  color: var(--muted);
+}
+
+/* ── Heatmap container — needs relative positioning ── */
+.heatmap-container {
+  display: block;
+}
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.legend-gradient {
+  width: 140px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(to right, blue, cyan, lime, yellow, red);
+  opacity: 0.85;
+}
+
+.legend-label {
+  font-size: 0.75rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 1.25rem 1rem 0.75rem;
+  }
+
+  .body-svg {
+    height: clamp(280px, 60vh, 460px);
+  }
+}
