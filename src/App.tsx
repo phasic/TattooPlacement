@@ -17,7 +17,6 @@ export default function App() {
   const { placements, loading, submitting, error, canSubmit, cooldownRemaining, submitPlacement, refetch } =
     usePlacements()
 
-  // Measure the rendered SVG size for the heatmap overlay
   useEffect(() => {
     const measure = () => {
       if (!svgContainerRef.current) return
@@ -39,13 +38,11 @@ export default function App() {
   const handleConfirm = useCallback(async () => {
     if (!pendingPoint) return
     const ok = await submitPlacement(pendingPoint)
-    if (ok) {
-      setView('success')
-    }
+    if (ok) setView('success')
   }, [pendingPoint, submitPlacement])
 
   const handleViewHeatmap = useCallback(async () => {
-    if (canSubmit()) return  // must have submitted at least once
+    if (canSubmit()) return
     await refetch()
     setView('heatmap')
   }, [refetch, canSubmit])
@@ -64,73 +61,80 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Help Tieke decide where to place her first tattoo</h1>
-        <p className="subtitle">Tap the body where you think it should go ✨</p>
-      </header>
 
-      <main className="app-main">
-        {view === 'select' && (
-          <div className="select-view">
+      {/* ── Selection view ── */}
+      {view === 'select' && (
+        <>
+          <header className="app-header">
+            <h1>Help Tieke decide where to place her first tattoo 🖊️</h1>
             <p className="instruction">
               {alreadySubmitted
                 ? `You've already voted! Come back in ${formatCooldown(cooldownRemaining())} to vote again.`
                 : pendingPoint
-                ? `Ooh, nice choice! Lock it in? 👇`
-                : `Where should Tieke get inked? Click the spot you think fits her best.`}
+                ? 'Ooh, nice choice! Lock it in below 👇'
+                : 'Tap the body where you think the tattoo should go'}
             </p>
+          </header>
 
+          <main className="app-main">
             <div className="body-container" ref={svgContainerRef}>
               <BodyOutline onClick={alreadySubmitted ? undefined : handleBodyClick} className="body-svg">
                 {pendingPoint && <ClickMarker x={pendingPoint.x} y={pendingPoint.y} />}
               </BodyOutline>
             </div>
+          </main>
 
+          <footer className="sticky-footer">
             {error && <p className="error-msg">{error}</p>}
-
-            <div className="actions">
-              {!alreadySubmitted && pendingPoint && (
-                <ConfirmButton onClick={handleConfirm} loading={submitting} />
-              )}
-              {alreadySubmitted && (
-                <button className="secondary-btn" onClick={handleViewHeatmap}>
-                  View Heatmap ({placements.length} picks)
-                </button>
-              )}
-            </div>
-
+            {!alreadySubmitted && pendingPoint && (
+              <ConfirmButton onClick={handleConfirm} loading={submitting} />
+            )}
+            {alreadySubmitted && (
+              <button className="primary-btn" onClick={handleViewHeatmap}>
+                🔥 See the heatmap ({placements.length} votes)
+              </button>
+            )}
             <p className="fine-print">
               {alreadySubmitted
-                ? 'Want to see where everyone voted? Check the heatmap!'
-                : 'Vote to unlock the heatmap and see where everyone thinks the tattoo should go.'}
+                ? "Vote to unlock the heatmap and see the crowd's verdict."
+                : 'One vote per hour · no account needed'}
             </p>
-          </div>
-        )}
+          </footer>
+        </>
+      )}
 
-        {view === 'success' && (
-          <div className="success-view">
+      {/* ── Success view ── */}
+      {view === 'success' && (
+        <>
+          <main className="app-main success-view">
             <div className="success-icon">🎉</div>
             <h2>Vote locked in!</h2>
-            <p>Your pick is in. Now see where everyone else thinks Tieke should get inked.</p>
-            <div className="actions">
-              <button className="primary-btn" onClick={handleViewHeatmap}>
-                See the Heatmap
-              </button>
-              <button className="secondary-btn" onClick={handleReset}>
-                Submit Another
-              </button>
-            </div>
-          </div>
-        )}
+            <p>Your pick is in. See where everyone else thinks Tieke should get inked.</p>
+          </main>
+          <footer className="sticky-footer">
+            <button className="primary-btn" onClick={handleViewHeatmap}>
+              🔥 See the heatmap
+            </button>
+            <button className="ghost-btn" onClick={handleReset}>
+              Vote again
+            </button>
+          </footer>
+        </>
+      )}
 
-        {view === 'heatmap' && (
-          <div className="heatmap-view">
+      {/* ── Heatmap view ── */}
+      {view === 'heatmap' && (
+        <>
+          <header className="app-header">
+            <h1>Here's the verdict 🗳️</h1>
             <p className="instruction">
               {loading
                 ? 'Loading votes…'
-                : `${placements.length} ${placements.length === 1 ? 'person has' : 'people have'} voted so far — here's the verdict!`}
+                : `${placements.length} ${placements.length === 1 ? 'person has' : 'people have'} voted so far`}
             </p>
+          </header>
 
+          <main className="app-main">
             <div className="body-container">
               <div className="svg-heatmap-wrapper" ref={svgContainerRef}>
                 <BodyOutline className="body-svg" />
@@ -143,21 +147,20 @@ export default function App() {
                 )}
               </div>
             </div>
+          </main>
 
+          <footer className="sticky-footer">
             <div className="legend">
-              <span className="legend-label">Low</span>
+              <span className="legend-label">Few votes</span>
               <div className="legend-gradient" />
-              <span className="legend-label">High</span>
+              <span className="legend-label">Most votes</span>
             </div>
-
-            <div className="actions">
-              <button className="primary-btn" onClick={handleReset}>
-                {alreadySubmitted ? '← Back' : 'Cast My Vote'}
-              </button>
-            </div>
-          </div>
-        )}
-      </main>
+            <button className="primary-btn" onClick={handleReset}>
+              ← Back
+            </button>
+          </footer>
+        </>
+      )}
     </div>
   )
 }

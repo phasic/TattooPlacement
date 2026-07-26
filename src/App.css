@@ -1,4 +1,4 @@
-/* ── Reset & base ── */
+/* ── Reset ── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6,102 +6,94 @@
 }
 
 :root {
-  --bg: #0f0f13;
-  --surface: #1a1a24;
-  --surface2: #242433;
-  --border: #2e2e42;
-  --accent: #dc2626;
+  --bg: #fdf6f0;
+  --surface: #ffffff;
+  --border: #e8ddd5;
+  --text: #1a1a2e;
+  --muted: #7a6f6a;
+  --accent: #e84393;
   --accent2: #f97316;
-  --text: #e8e8f0;
-  --muted: #8888aa;
-  --body-fill: #2a2a3e;
-  --body-stroke: #7b6ef0;
-  --radius: 12px;
+  --accent3: #7c3aed;
+  --body-fill: #fce4d6;
+  --body-stroke: #d4a89a;
+  --footer-h: 140px;
+  --radius: 16px;
 }
 
-html, body, #root {
+html, body {
   height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
-  min-height: 100vh;
+  line-height: 1.5;
 }
 
-/* ── Layout ── */
+/* ── App shell: full-height column ── */
 .app {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
+/* ── Header ── */
 .app-header {
-  width: 100%;
+  padding: 1.25rem 1.25rem 0.75rem;
   text-align: center;
-  padding: 2rem 1rem 1rem;
-  background: linear-gradient(180deg, #16162a 0%, transparent 100%);
+  flex-shrink: 0;
 }
 
 .app-header h1 {
-  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-size: clamp(1.1rem, 4.5vw, 1.5rem);
   font-weight: 800;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #7b6ef0, #dc2626);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.25;
 }
 
-.subtitle {
-  color: var(--muted);
-  font-size: 1rem;
-  margin-top: 0.25rem;
-}
-
-.app-main {
-  flex: 1;
-  width: 100%;
-  max-width: 640px;
-  padding: 1.5rem 1rem 3rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-/* ── Instructions ── */
+/* ── Instruction line ── */
 .instruction {
-  text-align: center;
-  font-size: 0.95rem;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
   color: var(--muted);
-  max-width: 440px;
-  min-height: calc(0.95rem * 1.6 * 2);
+  min-height: calc(0.9rem * 1.5 * 2);
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+}
+
+/* ── Main: fills remaining space above sticky footer ── */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: var(--footer-h);
+  overflow: hidden;
 }
 
 /* ── Body SVG container ── */
 .body-container {
-  position: relative;
+  flex: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
   width: 100%;
+  padding: 0.5rem;
 }
 
 .body-svg {
+  height: 100%;
+  max-height: calc(100dvh - var(--footer-h) - 120px);
   width: auto;
-  max-height: 70vh;
-  height: clamp(320px, 65vh, 560px);
   display: block;
-  filter: drop-shadow(0 0 24px rgba(123, 110, 240, 0.25));
+  filter: drop-shadow(0 8px 24px rgba(232,67,147,0.12));
 }
 
-/* SVG shapes default fill/stroke */
 .body-svg ellipse,
 .body-svg path {
   fill: var(--body-fill);
@@ -116,23 +108,43 @@ body {
   fill: none;
 }
 
-/* ── Actions ── */
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
+/* ── Tight wrapper for SVG + heatmap canvas ── */
+.svg-heatmap-wrapper {
+  position: relative;
+  display: inline-flex;
+  line-height: 0;
+  height: 100%;
 }
 
+/* ── Sticky footer ── */
+.sticky-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem calc(0.875rem + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1.5px solid var(--border);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.07);
+}
+
+/* ── Buttons ── */
 button {
   font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
-  padding: 0.7rem 1.5rem;
-  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease;
+  padding: 0.85rem 2rem;
+  width: 100%;
+  max-width: 360px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 button:active {
@@ -140,39 +152,43 @@ button:active {
 }
 
 button:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.confirm-btn,
-.primary-btn {
-  background: linear-gradient(135deg, #7b6ef0, #dc2626);
+.primary-btn,
+.confirm-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
   color: white;
-  box-shadow: 0 4px 20px rgba(123, 110, 240, 0.35);
+  box-shadow: 0 4px 16px rgba(232,67,147,0.3);
 }
 
-.confirm-btn:hover:not(:disabled),
-.primary-btn:hover:not(:disabled) {
-  box-shadow: 0 6px 28px rgba(123, 110, 240, 0.55);
+.primary-btn:hover:not(:disabled),
+.confirm-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 24px rgba(232,67,147,0.45);
   transform: translateY(-1px);
 }
 
-.secondary-btn {
-  background: var(--surface2);
-  color: var(--text);
-  border: 1px solid var(--border);
+.ghost-btn {
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem;
+  width: auto;
+  box-shadow: none;
 }
 
-.secondary-btn:hover:not(:disabled) {
-  background: var(--border);
+.ghost-btn:hover {
+  color: var(--text);
 }
 
 /* ── Spinner ── */
 .spinner {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.35);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -185,13 +201,15 @@ button:disabled {
 
 /* ── Error ── */
 .error-msg {
-  color: #f87171;
-  font-size: 0.875rem;
+  color: #dc2626;
+  font-size: 0.85rem;
   text-align: center;
-  background: rgba(239,68,68,0.1);
-  border: 1px solid rgba(239,68,68,0.25);
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  max-width: 360px;
 }
 
 /* ── Fine print ── */
@@ -203,12 +221,10 @@ button:disabled {
 
 /* ── Success view ── */
 .success-view {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.75rem;
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 3rem 2rem calc(var(--footer-h) + 2rem);
 }
 
 .success-icon {
@@ -218,18 +234,12 @@ button:disabled {
 
 .success-view h2 {
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .success-view p {
   color: var(--muted);
-}
-
-/* ── Tight wrapper around SVG + canvas so the absolute canvas aligns exactly ── */
-.svg-heatmap-wrapper {
-  position: relative;
-  display: inline-flex;
-  line-height: 0;
+  max-width: 300px;
 }
 
 /* ── Legend ── */
@@ -237,31 +247,20 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  font-size: 0.8rem;
-  color: var(--muted);
+  gap: 0.6rem;
   width: 100%;
+  max-width: 360px;
 }
 
 .legend-gradient {
-  width: 140px;
-  height: 12px;
-  border-radius: 6px;
-  background: linear-gradient(to right, blue, cyan, lime, yellow, red);
-  opacity: 0.85;
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #2563eb, #06b6d4, #22c55e, #eab308, #dc2626);
 }
 
 .legend-label {
-  font-size: 0.75rem;
-}
-
-/* ── Responsive ── */
-@media (max-width: 480px) {
-  .app-header {
-    padding: 1.25rem 1rem 0.75rem;
-  }
-
-  .body-svg {
-    height: clamp(280px, 60vh, 460px);
-  }
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
 }
