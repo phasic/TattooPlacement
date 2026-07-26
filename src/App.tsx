@@ -31,6 +31,7 @@ export default function App() {
   const [activeSide, setActiveSide] = useState<BodySide>('front')
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null)
   const [showDesign, setShowDesign] = useState(false)
+  const [hasVotedThisSession, setHasVotedThisSession] = useState(false)
 
   const svgRef = useRef<HTMLDivElement>(null)
   const frontHeatRef = useRef<HTMLDivElement>(null)
@@ -51,14 +52,16 @@ export default function App() {
   const handleConfirm = useCallback(async () => {
     if (!pendingPoint) return
     const ok = await submitPlacement({ x: pendingPoint.x, y: pendingPoint.y, side: activeSide })
-    if (ok) setView('success')
+    if (ok) {
+      setHasVotedThisSession(true)
+      setView('success')
+    }
   }, [pendingPoint, activeSide, submitPlacement])
 
   const handleViewHeatmap = useCallback(async () => {
-    if (canSubmit()) return
     await refetch()
     setView('heatmap')
-  }, [refetch, canSubmit])
+  }, [refetch])
 
   const handleReset = useCallback(() => {
     setPendingPoint(null)
@@ -70,7 +73,7 @@ export default function App() {
     return mins === 1 ? '1 minute' : `${mins} minutes`
   }
 
-  const alreadySubmitted = !canSubmit()
+  const alreadySubmitted = !canSubmit() || hasVotedThisSession
 
   const SideToggle = () => (
     <div className="side-toggle">
