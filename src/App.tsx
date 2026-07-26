@@ -171,7 +171,7 @@ export default function App() {
               <button className="design-peek-btn" onClick={() => setShowDesign(true)}>
                 🌸 See the tattoo design
               </button>
-              <h1>Here's the verdict 🗳️</h1>
+              <h1>Here's the verdict</h1>
               <p className="instruction">
                 {loading
                   ? 'Loading votes…'
