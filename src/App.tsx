@@ -45,9 +45,10 @@ export default function App() {
   }, [pendingPoint, submitPlacement])
 
   const handleViewHeatmap = useCallback(async () => {
+    if (canSubmit()) return  // must have submitted at least once
     await refetch()
     setView('heatmap')
-  }, [refetch])
+  }, [refetch, canSubmit])
 
   const handleReset = useCallback(() => {
     setPendingPoint(null)
@@ -64,8 +65,8 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>TattooPlacement</h1>
-        <p className="subtitle">Where would you put your tattoo?</p>
+        <h1>Help Tieke decide where to place her first tattoo</h1>
+        <p className="subtitle">Tap the body where you think it should go ✨</p>
       </header>
 
       <main className="app-main">
@@ -73,10 +74,10 @@ export default function App() {
           <div className="select-view">
             <p className="instruction">
               {alreadySubmitted
-                ? `You've already submitted. You can submit again in ${formatCooldown(cooldownRemaining())}.`
+                ? `You've already voted! Come back in ${formatCooldown(cooldownRemaining())} to vote again.`
                 : pendingPoint
-                ? 'Happy with this spot? Confirm your placement below.'
-                : 'Click anywhere on the body to mark your ideal tattoo spot.'}
+                ? `Ooh, nice choice! Lock it in? 👇`
+                : `Where should Tieke get inked? Click the spot you think fits her best.`}
             </p>
 
             <div className="body-container" ref={svgContainerRef}>
@@ -91,13 +92,17 @@ export default function App() {
               {!alreadySubmitted && pendingPoint && (
                 <ConfirmButton onClick={handleConfirm} loading={submitting} />
               )}
-              <button className="secondary-btn" onClick={handleViewHeatmap}>
-                View Heatmap ({placements.length} picks)
-              </button>
+              {alreadySubmitted && (
+                <button className="secondary-btn" onClick={handleViewHeatmap}>
+                  View Heatmap ({placements.length} picks)
+                </button>
+              )}
             </div>
 
             <p className="fine-print">
-              One submission per hour per browser. No account needed.
+              {alreadySubmitted
+                ? 'Want to see where everyone voted? Check the heatmap!'
+                : 'Vote to unlock the heatmap and see where everyone thinks the tattoo should go.'}
             </p>
           </div>
         )}
@@ -105,8 +110,8 @@ export default function App() {
         {view === 'success' && (
           <div className="success-view">
             <div className="success-icon">🎉</div>
-            <h2>Your pick has been added!</h2>
-            <p>Your placement is now part of the heatmap.</p>
+            <h2>Vote locked in!</h2>
+            <p>Your pick is in. Now see where everyone else thinks Tieke should get inked.</p>
             <div className="actions">
               <button className="primary-btn" onClick={handleViewHeatmap}>
                 See the Heatmap
@@ -122,8 +127,8 @@ export default function App() {
           <div className="heatmap-view">
             <p className="instruction">
               {loading
-                ? 'Loading placements…'
-                : `${placements.length} placement${placements.length === 1 ? '' : 's'} submitted so far.`}
+                ? 'Loading votes…'
+                : `${placements.length} ${placements.length === 1 ? 'person has' : 'people have'} voted so far — here's the verdict!`}
             </p>
 
             <div className="body-container heatmap-container" ref={svgContainerRef}>
@@ -147,7 +152,7 @@ export default function App() {
 
             <div className="actions">
               <button className="primary-btn" onClick={handleReset}>
-                {alreadySubmitted ? 'Back' : 'Submit My Pick'}
+                {alreadySubmitted ? '← Back' : 'Cast My Vote'}
               </button>
             </div>
           </div>
