@@ -479,6 +479,42 @@ button:disabled {
   border: 2px solid var(--border);
 }
 
+/* Scroll fade hint at the bottom of the welcome modal */
+.welcome-dialog .design-dialog-inner {
+  position: relative;
+}
+
+.welcome-dialog .design-dialog-inner::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.98));
+  display: block;
+  pointer-events: none;
+  flex-shrink: 0;
+  margin-top: -72px;
+}
+
+.scroll-hint {
+  position: sticky;
+  bottom: 8px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  animation: bounce 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(5px); }
+}
+
 .design-caption {
   font-size: 0.85rem;
   color: var(--muted);

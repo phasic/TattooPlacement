@@ -34,6 +34,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
           Once you confirm, you'll see a heatmap of where everyone thinks it should go. 🔥
         </p>
 
+        <p className="scroll-hint">scroll down ↓</p>
+
         <button className="primary-btn" onClick={onClose} style={{ marginTop: '0.5rem' }}>
           Let me vote! →
         </button>
