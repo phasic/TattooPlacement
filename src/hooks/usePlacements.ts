@@ -19,7 +19,7 @@ export interface Placement {
 
 const COLLECTION = 'placements'
 const LS_KEY = 'tattoo_submitted_at'
-const COOLDOWN_MS = import.meta.env.DEV ? 0 : 60 * 60 * 1000
+const COOLDOWN_MS = import.meta.env.DEV ? 0 : 3 * 60 * 60 * 1000
 
 export function usePlacements() {
   const [placements, setPlacements] = useState<Placement[]>([])

@@ -122,19 +122,7 @@ body {
   filter: drop-shadow(0 8px 24px rgba(232,67,147,0.12));
 }
 
-.body-svg ellipse,
-.body-svg path {
-  fill: var(--body-fill);
-  stroke: var(--body-stroke);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.body-svg line {
-  stroke: var(--body-stroke);
-  fill: none;
-}
+/* image handles silhouette — no fill/stroke needed on SVG shapes */
 
 /* ── Tight wrapper for SVG + heatmap canvas ── */
 .svg-heatmap-wrapper {
@@ -386,6 +374,10 @@ button:disabled {
 }
 
 /* ── Dialog / modal ── */
+.welcome-dialog {
+  width: min(94vw, 480px);
+}
+
 .design-dialog {
   border: none;
   border-radius: 24px;
@@ -463,14 +455,14 @@ button:disabled {
   border-radius: 16px;
   overflow: hidden;
   border: 2px solid var(--border);
-  background: #fdf6f0;
+  background: #ffffff;
   margin: 0.25rem 0;
 }
 
 .design-img {
-  width: 100%;
   display: block;
-  object-fit: cover;
+  width: 116%;
+  margin: -18% -8% -2%;
 }
 
 .design-caption {

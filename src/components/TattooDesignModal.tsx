@@ -24,16 +24,15 @@ export function TattooDesignModal({ onClose }: TattooDesignModalProps) {
         <h2 className="design-title">The design she wants 🌸</h2>
 
         <div className="design-img-wrap">
-          {/* Replace src with the real tattoo design image */}
           <img
-            src="https://placehold.co/480x480/fce4d6/d4a89a?text=Tattoo+design"
-            alt="Tattoo design placeholder"
+            src={`${import.meta.env.BASE_URL}tattoo-design.png`}
+            alt="Tieke's tattoo design"
             className="design-img"
           />
         </div>
 
         <p className="design-caption">
-          Help Tieke pick the perfect spot for this design on her body!
+          Help Tieke pick the perfect spot for this piece of art on her body!
         </p>
       </div>
     </dialog>

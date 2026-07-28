@@ -4,6 +4,7 @@ import { ClickMarker } from './components/ClickMarker'
 import { HeatmapOverlay } from './components/HeatmapOverlay'
 import { ConfirmButton } from './components/ConfirmButton'
 import { TattooDesignModal } from './components/TattooDesignModal'
+import { WelcomeModal } from './components/WelcomeModal'
 import { usePlacements, type BodySide } from './hooks/usePlacements'
 import './App.css'
 
@@ -31,6 +32,7 @@ export default function App() {
   const [activeSide, setActiveSide] = useState<BodySide>('front')
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null)
   const [showDesign, setShowDesign] = useState(false)
+  const [showWelcome, setShowWelcome] = useState(true)
   const [hasVotedThisSession, setHasVotedThisSession] = useState(false)
 
   const svgRef = useRef<HTMLDivElement>(null)
@@ -94,6 +96,7 @@ export default function App() {
 
   return (
     <div className="app">
+      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
       {showDesign && <TattooDesignModal onClose={() => setShowDesign(false)} />}
 
       {/* ── Selection view ── */}
@@ -133,15 +136,13 @@ export default function App() {
             {!alreadySubmitted && pendingPoint && (
               <ConfirmButton onClick={handleConfirm} loading={submitting} />
             )}
-            {alreadySubmitted && (
-              <button className="primary-btn" onClick={handleViewHeatmap}>
-                🔥 See the heatmap ({placements.length} votes)
-              </button>
-            )}
+            <button className="primary-btn" onClick={handleViewHeatmap}>
+              🔥 See the heatmap ({placements.length} votes)
+            </button>
             <p className="fine-print">
               {alreadySubmitted
-                ? "Vote to unlock the heatmap and see the crowd's verdict."
-                : 'One vote per hour · no account needed'}
+                ? `You've already voted! Come back in ${formatCooldown(cooldownRemaining())} to vote again.`
+                : 'One vote per 3 hours · no account needed'}
             </p>
           </footer>
         </>
