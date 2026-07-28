@@ -465,6 +465,20 @@ button:disabled {
   margin: -18% -8% -2%;
 }
 
+/* Welcome modal: always show full tattoo, no cropping */
+.welcome-dialog .design-img-wrap {
+  overflow: visible;
+  border: none;
+  background: none;
+}
+
+.welcome-dialog .design-img {
+  width: 100%;
+  margin: 0;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+}
+
 .design-caption {
   font-size: 0.85rem;
   color: var(--muted);
